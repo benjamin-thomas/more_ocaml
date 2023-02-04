@@ -8,7 +8,7 @@ The library `more` may be installed with:
 opam install more-ocaml
 ```
 
-## Dev workflow
+## Dev workflow n°1
 
 1. Launch the `utop` wrapper at:
     `./manage/dev/utop`
@@ -35,4 +35,12 @@ An alternative could be to combine steps 2 and 3 in one go, like this:
 
 # Run second, pane 1
 foreman start -f Procfile.dev ; kill $(cat .utop.ppid)
+```
+
+## Dev workflow n°2
+
+Run the inline tests, as such:
+
+```
+dune runtest -w
 ```
