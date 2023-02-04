@@ -1,2 +1,3 @@
 (library
- (name more_ocaml))
+ (name more_ocaml)
+ (libraries more))

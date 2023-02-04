@@ -1,0 +1,2 @@
+# foreman start -f Procfile.dev
+kill_repl: git ls-files "*.ml" "*.mli" "*/.ocamlinit" | entr -p bash -c 'kill $(cat ./.utop.pid)'

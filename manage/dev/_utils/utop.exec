@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd ./lib
+echo $$ >../.utop.pid
+exec utop

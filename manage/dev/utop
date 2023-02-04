@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo $$ >./.utop.ppid
+
+while true; do
+    ./manage/dev/_utils/utop.exec
+done
