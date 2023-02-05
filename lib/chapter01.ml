@@ -327,7 +327,7 @@ let%test _ = [ 3; 2; 1 ] = rev [ 1; 2; 3 ]
      Now `setify` can be defined entirely using folds.
  *)
 
-let mem x = List.fold_left (fun acc x' -> acc || x == x') false
+let mem x = List.fold_left (fun acc x' -> acc || x = x') false
 
 let%test _ = mem 1 [ 1; 2; 3 ]
 let%test _ = mem 2 [ 1; 2; 3 ]
@@ -360,8 +360,6 @@ let join_space = function
   | [] -> ""
   | h :: t -> List.fold_left (fun acc elem -> acc ^ " " ^ elem) h t
 ;;
-
-let x = String.concat
 
 let%test _ = "Hello World" = join_space [ "Hello"; "World" ]
 
