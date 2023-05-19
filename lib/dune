@@ -1,6 +1,5 @@
 (library
  (name more_ocaml)
- (libraries more)
  (inline_tests)
  (preprocess
   (pps ppx_inline_test)))
