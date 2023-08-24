@@ -1,0 +1,3 @@
+(executable
+ (name cat_first_line)
+ (libraries more_ocaml))

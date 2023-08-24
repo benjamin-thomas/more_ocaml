@@ -1,7 +1,11 @@
 #!/bin/bash
 
+set -e
+
 echo $$ >./.utop.ppid
 
 while true; do
+    dune build
+    echo BUILD OK
     ./manage/dev/_utils/utop.exec
 done
