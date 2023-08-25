@@ -123,7 +123,6 @@ let a_verbose : t = { x = { contents = 0 } }
 
 let a' =
   ()
-  ; print_int a.x.contents
   ; (a.x :=
        let x = a.x in
        !x + 1)
@@ -139,7 +138,6 @@ let b : t' = { x = 0 }
 
 let b' =
   ()
-  ; print_int b.x
   ; b.x <- b.x + 1
   ; b
 ;;
