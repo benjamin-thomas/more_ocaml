@@ -72,13 +72,25 @@ let process f str : string =
 ;;
 
 (*
+ * BYTE BY BYTE COMPRESSION SCHEME
+ *)
 
-FIXME: try to find something more elegant than manipulating ints for bytes
+(*
 
 We have 3 states for the bit pattern:
-  10000000 (128) -> end of decoding
-  0xxxxxxx       -> different run
-  1xxxxxxx       -> same run
+  10000000 (=128) -> end of decoding
+  0xxxxxxx (<128) -> different run
+  1xxxxxxx (>128) -> same run
+
+Checking against the int's value is not very elegant. I could use a bit mask, like such:
+
+utop # 0b10000000 land 129;;
+- : int = 128
+
+But then, what would masking against a big number mean? Or a negative number?
+Since we don't have a built-in uint8 type, I'll keep it simple and do as the author said.
+
+TODO: I should also look into the `ocaml-stdint` lib, it provides many integer types.
 
 See:
 {|
@@ -88,21 +100,20 @@ See:
 *)
 exception EOD
 
-let is_different_run x = x >= 0 && x <= 127
-let is_same_run x = x > 128 && x <= 255
+let is_bit_set pattern n = pattern land n = pattern
 
-let decompress (i : input) (o : output) =
+let decompress (inp : input) (out : output) =
   try
     while true do
-      match i.byte () with
-      | x when is_different_run x ->
-          for _ = 1 to x + 1 do
-            o.byte (i.byte ())
+      match inp.byte () with
+      | n when n >= 0 && n <= 127 ->
+          for _ = 1 to n + 1 do
+            out.byte (inp.byte ())
           done
-      | x when is_same_run x ->
-          let c = i.byte () in
-          for _ = 1 to 257 - x do
-            o.byte c
+      | n when n > 128 && n <= 255 ->
+          let c = inp.byte () in
+          for _ = 1 to 257 - n do
+            out.byte c
           done
       | 128 -> raise EOD
       | _ -> failwith "wat"
@@ -114,63 +125,65 @@ let decompress (i : input) (o : output) =
 let decompress_string = process decompress
 let rewind inp = inp.seek (inp.pos () - 1)
 
-let get_same i =
-  let rec get ch c =
-    if c = 128 then
+let get_same inp =
+  let rec get n len =
+    if len = 128 then
       128
     else
       try
-        if i.byte () = ch then
-          get ch (c + 1)
+        if inp.byte () = n then
+          get n (len + 1)
         else (
           ()
-          ; rewind i
-          ; c
+          ; rewind inp
+          ; len
         )
       with
-      | End_of_file -> c
+      | End_of_file -> len
   in
-  let ch = i.byte () in
-  (ch, get ch 1)
+  let n = inp.byte () in
+  (n, get n 1)
 ;;
 
-let get_different i =
-  let rec aux a c =
-    if c = 128 then
-      List.rev a
+let get_different inp =
+  let rec aux acc len =
+    if len = 128 then
+      List.rev acc
     else
       try
-        let ch' = i.byte () in
-        if ch' <> List.hd a then
-          aux (ch' :: a) (c + 1)
+        let n = inp.byte () in
+        if n <> List.hd acc then
+          aux (n :: acc) (len + 1)
         else (
           ()
-          ; rewind i
-          ; rewind i
-          ; List.rev (List.tl a)
+          ; rewind inp
+          ; rewind inp
+          ; List.rev (List.tl acc)
         )
       with
-      | End_of_file -> List.rev a
+      | End_of_file -> List.rev acc
   in
-  aux [ i.byte () ] 1
+  aux [ inp.byte () ] 1
 ;;
 
-let compress (i : input) (o : output) =
+let compress (inp : input) (out : output) =
   try
     while true do
-      match get_same i with
+      match get_same inp with
       | _, 1 ->
           ()
-          ; rewind i
-          ; let cs = get_different i in
-            o.byte (List.length cs - 1)
-            ; List.iter o.byte cs
-      | b, c ->
-          o.byte (257 - c)
-          ; o.byte b
+          ; rewind inp
+          ; let ns = get_different inp in
+            ()
+            ; out.byte (List.length ns - 1)
+            ; List.iter out.byte ns
+      | n, len ->
+          ()
+          ; out.byte (257 - len)
+          ; out.byte n
     done
   with
-  | End_of_file -> o.byte 128
+  | End_of_file -> out.byte 128
 ;;
 
 let compress_string = process compress
@@ -193,3 +206,7 @@ let%test _ =
   let example = "((5.000000, 4.583333), (4.500000,5.000000))" in
   example = (example |> compress_string |> decompress_string)
 ;;
+
+(*
+ * TODO: BIT BY BIT COMPRESSION SCHEME
+ *)
