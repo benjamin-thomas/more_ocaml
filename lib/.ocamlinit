@@ -1,6 +1,0 @@
-#use_output "dune ocaml top";;
-
-open More_ocaml.Chapter05;;
-
-(* print_endline greet;;
-Printf.printf "Hello from chapter 1: %d" hello;; *)
