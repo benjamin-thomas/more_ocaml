@@ -181,6 +181,30 @@ module Q2 = struct
   ;;
 end
 
+let%test _ =
+  let arr = [| 0; 0; 0; 0; 0 |] in
+  let () = Q2.fill arr { beg = 1; len = 3 } 1 in
+  arr = [| 0; 1; 1; 1; 0 |]
+;;
+
+module Q2_book_solution = struct
+  (* I forgot about this possiblity, I like it! *)
+  type start = Start of int
+  type length = Length of int
+
+  let fill arr (Start beg) (Length len) v =
+    for x = beg to beg + len - 1 do
+      arr.(x) <- v
+    done
+  ;;
+end
+
+let%test _ =
+  let arr = [| 0; 0; 0; 0; 0 |] in
+  let () = Q2_book_solution.fill arr (Start 1) (Length 3) 1 in
+  arr = [| 0; 1; 1; 1; 0 |]
+;;
+
 (*
  * Q3. Build labelled versions of functions from the [Buffer] module, choosing
  *     which functions and arguments to label as appropriate
