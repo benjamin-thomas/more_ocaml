@@ -631,6 +631,33 @@ let%expect_test _ =
 
 (* END: Book solution *)
 
+(* Another solution, many months later.
+
+   Interesting to note that such a simple solution is very **much** more performant
+   that the "naive" implementation of fib (computing n-1 + n-2 recursively).
+*)
+
+(** unfold takes a function [f] that will generate the next state,
+    and the initial state [init] *)
+let rec unfold f init =
+  let (a, b) = f init in
+  Cons (a, fun () -> unfold f b)
+;;
+
+let lfib = unfold (fun (a, b) -> (a, (b, a + b))) (0, 1)
+
+(* Using the standard lib, for comparaison *)
+let fibs = Seq.unfold (fun (a, b) -> Some (a, (b, a + b))) (0, 1)
+
+let%expect_test _ =
+  ()
+  ; comma_print @@ ltake lfib 10
+  ; [%expect {| 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 |}]
+  ; ()
+  ; comma_print @@ List.of_seq @@ Seq.take 10 fibs
+  ; [%expect {| 0, 1, 1, 2, 3, 5, 8, 13, 21, 34 |}]
+;;
+
 (*
  * 5. Write the function [unleave] which, given a lazy list, returns two lazy lists,
  *    one containing elements at positions 0,2,4,6... of the original list, and the other
@@ -658,7 +685,7 @@ let unleave ll =
 ;;
 
 let%expect_test _ =
-  let a, b = unleave (lseq 0) in
+  let (a, b) = unleave (lseq 0) in
   ()
   ; comma_print @@ ltake a 10
   ; [%expect {| 0, 2, 4, 6, 8, 10, 12, 14, 16, 18 |}]
@@ -676,7 +703,7 @@ let rec unleave (Cons (h1, tf1)) =
 [@@ocamlformat "disable"]
 
 let%expect_test _ =
-  let a, b = unleave (lseq 0) in
+  let (a, b) = unleave (lseq 0) in
   ()
   ; comma_print @@ ltake a 10
   ; [%expect {| 0, 2, 4, 6, 8, 10, 12, 14, 16, 18 |}]

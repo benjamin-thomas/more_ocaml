@@ -21,4 +21,4 @@ sequence-style=before
 # exp-grouping=preserve
 
 # parens-tuple=always
-# parens-tuple-patterns=always
+parens-tuple-patterns=always
