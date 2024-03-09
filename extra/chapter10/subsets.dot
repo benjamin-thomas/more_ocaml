@@ -1,0 +1,33 @@
+digraph {
+    label = "Given a set of n things, there are 2n combinations.\nOur items='(a b c).\nWe discard on the left, cons on the right.";
+    labelloc = "top";
+    
+    a1 -> {b1 b2} [label = "a";];
+    
+    b1 -> {c1 c2} [label = "b";];
+    b2 -> {c3 c4} [label = "b";];
+    
+    c1 -> {d1 d2} [label = "c";];
+    c2 -> {d3 d4} [label = "c";];
+    c3 -> {d5 d6} [label = "c";];
+    c4 -> {d7 d8} [label = "c";];
+    
+    a1 [label = "'()";];
+    
+    b1 [label = "'()";];
+    b2 [label = "'(a)";];
+    
+    c1 [label = "'()";];
+    c2 [label = "'(b)";];
+    c3 [label = "'(a)";];
+    c4 [label = "'(a b)";];
+    
+    d1 [label = "'()";];
+    d2 [label = "'(c)";];
+    d3 [label = "'(b)";];
+    d4 [label = "'(b c)";];
+    d5 [label = "'(a)";];
+    d6 [label = "'(a c)";];
+    d7 [label = "'(a b)";];
+    d8 [label = "'(a b c)";];
+}
